@@ -1,114 +1,90 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+import { HomeScreen } from './lib/components/homeScreen';
+import ThirdScreen from './lib/components/thirdScreen';
+import FirstScreen from './lib/components/firstScreen';
+import SecondScreen from './lib/components/secondScreen';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
+import React, { Component } from 'react';
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+//import redux structure neccessary
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+//import all reducer
+import allReducers from './lib/reducer/index';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+const customNavigationOption = function (title, backgroundColor) {
+  return navigationOptions = {
+    headerTitleStyle: {
+      color: "#FFFFFF",
+      fontWeight: "bold",
+      fontSize: 18,
+      flex: 1,
+      textAlign: 'center',
+      alignSelf: 'center',
+      marginRight: 75
+    },
+    headerTintColor: '#FFFFFF',
+    headerTitle: title,
+    headerStyle: {
+      backgroundColor: backgroundColor
+    }
+  }
+}
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+const HomeStack = createStackNavigator({
+  Home: {
+    screen: HomeScreen
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  Third: {
+    screen: ThirdScreen,
+    navigationOptions: customNavigationOption("Third Screen", "#ff8080")
   },
-  body: {
-    backgroundColor: Colors.white,
+  First: {
+    screen: FirstScreen,
+    navigationOptions: customNavigationOption("First Screen", "#0099ff")
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  Second: {
+    screen: SecondScreen,
+    navigationOptions: customNavigationOption("Second Screen", "#0099ff")
+  }
+});
+
+const drawerScreen = createDrawerNavigator({
+  Home: {
+    screen: HomeStack,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
+  First: {
+    screen: FirstScreen,
+    navigationOptions: customNavigationOption("First Screen", "#0099ff")
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+  Second: {
+    screen: SecondScreen,
+    navigationOptions: customNavigationOption("Second Screen", "#0099ff")
+  }
+}, {
+  drawerLockMode: "unlocked",
+  initialRouteName: 'Home'
+});
+
+const AppStack = createSwitchNavigator({
+  drawer: {
+    screen: drawerScreen
   },
 });
 
-export default App;
+const AppContainer = createAppContainer(AppStack);
+
+const store = createStore(allReducers, applyMiddleware(thunk));
+
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <AppContainer />
+      </Provider>
+    );
+  }
+};
