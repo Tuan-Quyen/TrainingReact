@@ -16,6 +16,7 @@ var sharedBlacklist = [
   /heapCapture\/bundle\.js/,
   /.*\/__tests__\/.*/
 ];
+
 to:
 
 var sharedBlacklist = [
